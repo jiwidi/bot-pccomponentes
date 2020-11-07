@@ -68,7 +68,9 @@ class Bot:
             log.info(f"Loaded page for {product_title.text}")
         except:
             log.error(self.driver.current_url)
-
+        WebDriverWait(self.driver, 5).until(
+                presence_of_element_located((By.XPATH, '//*[@id="btnsWishAddBuy"]/button[3]'))
+            )
         availability = self.driver.find_element_by_xpath(
             '//*[@id="btnsWishAddBuy"]/button[3]'
         ).text.replace("\n", " ")
@@ -78,6 +80,9 @@ class Bot:
         while not availability=="Comprar":
             self.driver.refresh()
             log.info("Refreshing page.")
+            WebDriverWait(self.driver, 5).until(
+                presence_of_element_located((By.XPATH, '//*[@id="btnsWishAddBuy"]/button[3]'))
+            )
             availability = self.driver.find_element_by_xpath(
             '//*[@id="btnsWishAddBuy"]/button[3]'
             ).text.replace("\n", " ")
