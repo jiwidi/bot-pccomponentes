@@ -58,7 +58,7 @@ class Bot:
 
         log.info(f"Logged in as {self.username}")
 
-    def run_item(self, item_url, price_limit=1000, delay=3):
+    def run_item(self, item_url, price_limit=1500, delay=5):
         log.info(f"Loading page: {item_url}")
         self.driver.get(item_url)
         try:
@@ -75,9 +75,12 @@ class Bot:
             '//*[@id="btnsWishAddBuy"]/button[3]'
         ).text.replace("\n", " ")
 
+        price = WebDriverWait(self.driver, 5).until(
+                presence_of_element_located((By.ID, 'precio-main'))
+            )
+        price = float(price.text.replace("€","").replace(",","."))
         log.info(f"Initial availability message is: {availability}")
-
-        while not availability=="Comprar":
+        while not availability=="Comprar" or price > price_limit:
             self.driver.refresh()
             log.info("Refreshing page.")
             WebDriverWait(self.driver, 5).until(
@@ -86,8 +89,12 @@ class Bot:
             availability = self.driver.find_element_by_xpath(
             '//*[@id="btnsWishAddBuy"]/button[3]'
             ).text.replace("\n", " ")
-            log.info(f"Current availability message is: {availability}")
-            time.sleep(0.5)
+            price = WebDriverWait(self.driver, 5).until(
+                presence_of_element_located((By.ID, 'precio-main'))
+            )
+            price = float(price.text.replace("€","").replace(",","."))
+            log.info(f"Current availability message is: {availability} at {price} eur")
+            time.sleep(delay)
 
         log.info("Item in stock, buy now button found!")
         log.info(f"Attempting to buy item")
